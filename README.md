@@ -36,6 +36,31 @@ The currently revised code sections are:
 
 Later stages are still being adapted from the pilot project.
 
+## Python Environment Setup
+
+This project uses a project-level Python virtual environment in `.venv/`. The environment is local to this folder and is ignored by Git.
+
+From the project root, activate the environment:
+
+```powershell
+cd C:\projects\ECI1
+.\.venv\Scripts\Activate.ps1
+```
+
+Install or refresh the project packages from `requirements.txt`:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+After activation, run Python scripts from the project root. For example:
+
+```powershell
+python 3_code\2_acoustic_analysis\extract_phoneme_acoustic_contours.py
+```
+
+VS Code is configured to use `.venv\Scripts\python.exe` for this workspace. If VS Code does not pick it up immediately, run `Python: Select Interpreter` and choose the interpreter inside `C:\projects\ECI1\.venv`.
+
 ## Git Setup
 
 Initialize local Git from the project root:
@@ -95,4 +120,3 @@ Do not commit:
 - Notebook outputs
 
 See `docs/data_management.md` for details.
-

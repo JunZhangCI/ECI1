@@ -1,0 +1,17 @@
+numpy
+pandas
+scipy
+matplotlib
+librosa
+soundfile
+praat-parselmouth
+mne
+eelbrain
+statsmodels
+scikit-learn
+tqdm
+mat73
+pyyaml
+praat-textgrids
+rsatoolbox
+gammatone
