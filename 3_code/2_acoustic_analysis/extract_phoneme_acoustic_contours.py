@@ -18,9 +18,9 @@ except ImportError as exc:
 # Settings
 # =========================
 # Empty set() means include all groups for that variable.
-SELECTED_EMOTIONS = {"hap", "sad", "neu"}  # e.g., {"hap", "sad", "neu"} or set()
-SELECTED_GENDERS = {"f"}  # e.g., {"f"} or set()
-SELECTED_SPEAKING_STYLES = {"CDS"}  # e.g., {"CDS"} or set()
+SELECTED_EMOTIONS = set()  # e.g., {"hap", "sad", "neu"} or set()
+SELECTED_GENDERS = set()  # e.g., {"f"} or set()
+SELECTED_SPEAKING_STYLES = set()  # e.g., {"CDS"} or set()
 
 PHONE_TIER_NAME = "phones"
 
