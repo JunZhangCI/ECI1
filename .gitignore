@@ -26,6 +26,7 @@ slprj/
 # Local research data: do not version participant data or generated outputs
 2_data/
 emo_audio/
+docs/
 
 # Generated study stimuli and audio exports can appear outside emo_audio
 **/stimuli/
