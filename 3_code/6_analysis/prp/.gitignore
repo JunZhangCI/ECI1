@@ -1,0 +1,19 @@
+# Ignore everything
+*
+
+# But NOT these folders or files:
+!.gitignore
+!neuraspeech/
+!neuraspeech/*
+!neuraspeech/trf
+!neuraspeech/trf/*
+!neuraspeech/trf/conf
+!neuraspeech/trf/conf/conf.yaml
+!neuraspeech/trf/misc
+!neuraspeech/trf/misc/*
+__pycache__
+!README.md
+!environment.yml
+!requirements.txt
+!*.ipynb
+desktop.ini

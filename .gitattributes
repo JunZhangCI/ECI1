@@ -1,0 +1,14 @@
+# Keep Jupyter notebooks in Git as source documents without output cells.
+*.ipynb filter=nbstripout
+*.ipynb diff=ipynb
+
+# Normalize text files for cross-platform collaboration.
+*.m text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.txt text eol=lf
+*.csv text eol=lf
+

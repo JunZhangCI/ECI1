@@ -1,0 +1,15 @@
+name: neuraspeech
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - eelbrain>=0.4
+  - ipykernel=7.1.0
+  - mat73=0.65
+  - statsmodels>=0.14.5
+  - pyyaml=6.0.3
+  - pip:
+    - praat-textgrids==1.4.0
+    - soundfile==0.13.1
+    - rsatoolbox==0.2.0
+    - gammatone==1.0.3

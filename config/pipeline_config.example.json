@@ -1,0 +1,48 @@
+{
+  "project": {
+    "name": "ECI1",
+    "root_note": "All paths are resolved relative to the project root unless absolute."
+  },
+  "participants": {
+    "group": "pilot",
+    "subjects": ["sub-pilot_1"]
+  },
+  "stimuli": {
+    "task": "emo",
+    "emotions": ["neu", "hap", "sad"],
+    "genders": ["f", "m"],
+    "styles": ["CDS", "ADS"],
+    "target_sample_rate_hz": 48000,
+    "target_intensity_db": 80,
+    "inter_stimulus_interval_sec": 0
+  },
+  "eeg_preprocessing": {
+    "sample_rate_hz": 128,
+    "high_pass_hz": 1,
+    "low_pass_hz": 30,
+    "reference_channels": ["EXG5"],
+    "ci_deactivated_channels": [],
+    "manual_channel_rejection": true,
+    "ica_modes": {
+      "first": "sobi",
+      "second": "sobi"
+    }
+  },
+  "prp": {
+    "window_sec": 1.0,
+    "baseline_sec": 0.1,
+    "detrend_mode": "linear",
+    "baseline_correction": false,
+    "trial_rejection": false,
+    "standardize": false
+  },
+  "trf": {
+    "predictor_sets": [
+      "envelope",
+      "mfcc",
+      "phoneme_onset",
+      "phoneme_class"
+    ]
+  }
+}
+

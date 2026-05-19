@@ -1,0 +1,165 @@
+# ============================================================================================ #
+#  This file contains the configurations for everything in the TRF analysis pipeline.          #
+#  You can modify these configurations as needed for your specific dataset and analysis goals. #
+# ============================================================================================ #
+
+# ------------------------------------------------------------ #
+# 1. Configurations for prepare_eeg.py and EEG data in general #
+# ------------------------------------------------------------ #
+EEG:
+  # Path to the directory containing the EEG files. Assume that you've done all preprocessing steps (e.g., ICA, filtering)
+  # and that the EEG files are epoched and saved in .fif format. For each epoch in each file, there should be a corresponding 
+  # audio stimulus file in .wav format. 
+  EEG_path: C:/Users/xyc6648/OneDrive - Northwestern University/Desktop/research/ASD_eeg/ICA
+
+  # Path to the metadata file. 
+  # This should be a .csv file. By default, it should contain at least two columns: 'filename' (the name of the EEG file) 
+  # and 'stim' (a list of the stimulus files corresponding to each epoch in the EEG file, separated by semicolons).
+  # If your metadata have alternative column names, you can specify them in the 'metadata' section below.
+  metadata:
+    path: misc/example_metadata.csv
+    filename_col: 'filename'
+    stim_col: 'stim'
+  
+  # Sampling rate of the processed EEG data (in Hz).
+  # Eventually, all predictors will have the same sampling rate as the EEG data, so make sure to set this to the desired 
+  # sampling rate for your TRF analysis.
+  sr: 128
+
+  # Specify here if you have any channels that you want to drop from the EEG data
+  channels_to_drop: ['M1', 'M2']
+
+  # How to handle different epoch durations across files and epochs.
+  # If 'min', get the stimuli of all epochs in each EEG file, find the minimun duration of the stimuli, and trim all EEG epochs to that duration.
+  # If 'fixed', set a global fixed_duration and trim all epochs in all EEG files to that duration.
+  duration_mode: 'min'
+  fixed_duration: 50 # In seconds, only used if duration_mode is set to 'fixed'
+
+  # Where to save the prepared EEG data. The prepared EEG data will be saved in .pickle format
+  output_path: eeg/prepared  
+
+# ----------------------------- #
+# 2. Path to the stimulus files #
+# ----------------------------- #
+# This should be a directory containing the audio files corresponding to the EEG epochs
+stim_path: stim/alice 
+
+# ------------------------------------ #
+# 3. Configurations for the predictors #
+# ------------------------------------ #
+# This section contains all configurations for all predictor maker scripts (make_xxx.py).
+# More configurations for other predictors may be be added here in the future.
+predictor:
+  # Name of the predictor set. This will create a subdirectory with this name under the 'predictors' directory, 
+  # and all predictors generated with the current configurations will be saved in that subdirectory. Will be useful
+  # for keeping track of different predictor sets generated with different configurations.
+  predictor_set: acou_pred_set
+
+  # make_gammatone_predictors.py
+  # Configurations for generating gammatone spectrogram and onset predictors. The gammatone spectrogram predictors will be 
+  # generated using the gammatone filterbank implementation in the Eelbrain package. The default configurations should be good
+  # for most cases, but feel free to modify them as needed. For more details on the available configurations, see the Eelbrain 
+  # documentation: https://eelbrain.readthedocs.io/en/stable/generated/eelbrain.gammatone_bank.html
+  gammatone:
+    gammatone_bank_cfgs:
+      f_min: 20
+      f_max: 8000 # Or 5000
+      n: 256
+      tstep: 0.001
+      location: left
+
+    # This controls how many frequency bands there will be in the final multiband predictors.
+    n_bands: 8
+
+    # Saturation model for auditory edge-detection model
+    c: 30
+
+    # Options: log, linear, power
+    scale: log
+
+    # Save the raw gammatone spectrogram to disk or not? This file can be quite big so set to False if not needed.
+    save_raw_gt_spec: False
+
+  # make_predictors_from_textgrids.py
+  # Configurations for generating impulse-like predictors from event annotations of TextGrid files. Events may be any annotated
+  # items in interval or point tiers, such as phonemes, pitch accents, or other labeled markers. For each stimulus file, the selected 
+  # events (see select_events) are converted into a binary predictor matrix with shape N x T, where N is the number of event types 
+  # and T is the number of time points matching the EEG sampling rate. Each row corresponds to one event type, populated with 1s 
+  # marking when that event occurs and 0s elsewhere.
+  textgrid:
+    # Path to TextGrid files. The script will construct predictors for all stimulus files in stim_path. So for every stimulus, there 
+    # needs to be a corresponding TextGrid with the same name except for the file extension (e.g., track1.wav, track1.TextGrid),
+    textgrid_path: stim/alice_textgrids
+
+    # Give a name to the predictors. A folder under predictor_set will be created using this name.
+    predictor_name: phoneme
+
+    # Name of the target tier for which you want to generate predictors.
+    target_tier: phones
+
+    # List of event labels in the target tier. You'll need to specify the events you want to include so that the script knows the 
+    # dimensions of the output predictors. For phoneme annotations, you want to list all phonemes you need here.
+    select_events: ['AA', 'AO', 'AE', 'AW', 'AY', 'OW', 'EY', 'EH', 'ER', 'IY', 'IH', 'UW', 'W', 'L', 'R', 'M', 'N', 'NG', 'S', 'SH', 'F', 'HH', 'Z', 'V', 'DH', 'P', 'T', 'K', 'B', 'D', 'G']
+
+    # You may use regex to transform the labels. The option remove_pattern allows you to specify strings to be removed. For exameple,
+    # `[012]$` will drop stress level markers 0, 1, 2 from the phoneme labels.
+    event_label_regex:
+      remove_pattern: '[012]$'
+
+      # Whether to apply the regex before selecting the events of interest. If True, event labels are first modified by the regex, 
+      # and select_events should refer to the updated labels after that transformation. For example, if the regex removes vowel stress 
+      # markers, then vowels in select_events should be specified without the final stress digit. 
+      apply_before_select: True 
+
+    # Where exactly do you want to place the 1 impulse for an event, at its start, end, or midpoint? You can also set it to 'fill' to 
+    # fill the time interval of the entire event with 1s. Note that this configuration only applis to interval tiers. For point 
+    # intervals, the impulses will just be placed on where the event happens. 
+    alignment: start # start, end, mid, fill
+
+# ---------------------------------------- #
+# 4. Configurations for the TRF estimation #
+# ---------------------------------------- #
+# The configurations for the TRF estimation with boosting. The TRF estimation will be done with run_boosting.py.
+# Highly recommend to use the parallel processing option and submit a job to a computing cluster like Northestern Quest for 
+# this step, especially if you have a large dataset and/or a large number of predictors.
+TRF_estimation:
+  # Path to the prepared EEG data (output from prepare_eeg.py). The TRF estimation script will look for .pickle files 
+  # in this directory.
+  eeg_path: eeg/prepared
+
+  # Path to the directory containing the predictor files.
+  predictor_set_path: predictors/acou_pred_set
+
+  # Where to save the TRF estimation results.
+  results_path: results
+
+  # Whether to use parallel processing for the TRF estimation. Highly recommend to set this to True and submit a job to
+  # run the script. Set n_workers to the number of CPU cores you want to use for the parallel processing. If NULL,
+  # will use all available cores.
+  use_parallel_processing: True
+  n_workers: NULL
+
+  # Specify your base model here. This base model will include all predictors you're interested in.
+  # Format should be like the predictor files but without the beginning "XXX~" and the ".pickle" extenstion.
+  # For example: [gammatone-8, gammatone-on-8] means that the base model will include the gammatone envelope at 
+  # 8 frequency bands and the gammatone onsets at 8 frequency bands.
+  base_model: [gammatone-8, gammatone-on-8]
+
+  # Either 'unique_contribution' or 'base_only'. If 'unique_contribution', will estimate also estimate model with each predictor
+  #  excluded from the base model, in order to estimate the unique contribution of each predictor in the base model by excluding 
+  # it from the full model. If 'base_only', will only estimate the full model with all predictors included.
+  estimation_mode: base_only
+
+  # Configurations for the boosting algorithm. The default configurations should be good for most cases.
+  # See the Eelbrain documentation for details.
+  boosting_cfgs:
+    tstart: -0.1
+    tstop: 0.5
+    error: l1 # l1 or l2
+    delta: 0.005
+    basis: 0.05
+    partitions: 5
+    test: 1
+    selective_stopping: 1
+
+random_seed: 2026

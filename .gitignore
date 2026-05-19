@@ -1,0 +1,66 @@
+# Local operating system and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+**/desktop.ini
+.vscode/*
+!.vscode/
+!.vscode/*.json
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# MATLAB generated files and autosaves
+*.asv
+*.m~
+slprj/
+
+# Local research data: do not version participant data or generated outputs
+2_data/
+emo_audio/
+
+# Generated study stimuli and audio exports can appear outside emo_audio
+**/stimuli/
+**/scaled/
+**/*.wav
+**/*.mp3
+**/*.flac
+**/*.aiff
+**/*.TextGrid
+
+# EEG, MATLAB data, and model outputs
+**/*.bdf
+**/*.edf
+**/*.set
+**/*.fdt
+**/*.mat
+**/*.pkl
+**/*.pickle
+**/*.h5
+**/*.hdf5
+
+# Rendered writing and presentation artifacts
+**/*.docx
+**/*.pdf
+**/*.pptx
+4_presentation/
+
+# Logs and temporary outputs
+*.log
+logs/
+tmp/
+temp/
+outputs/
+results/
+figures/generated/
+
+# Keep source notebooks, but strip outputs before commit via nbstripout/pre-commit
+!**/*.ipynb
