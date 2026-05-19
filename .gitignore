@@ -65,3 +65,6 @@ figures/generated/
 
 # Keep source notebooks, but strip outputs before commit via nbstripout/pre-commit
 !**/*.ipynb
+
+# ignore automation codes
+automation/
