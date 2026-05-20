@@ -66,8 +66,7 @@ VOWELS = {
 STOPS = {"P", "B", "T", "D", "K", "G"}
 FRICATIVES = {"F", "V", "TH", "DH", "S", "Z", "SH", "ZH", "HH"}
 AFFRICATES = {"CH", "JH"}
-NASALS = {"M", "N", "NG"}
-APPROXIMANTS = {"L", "R", "W", "Y"}
+NASALS_APPROXIMANTS  = {"M", "N", "NG", "L", "R", "W", "Y"}
 
 
 def remove_stress(phone):
@@ -90,10 +89,8 @@ def get_manner(phone):
         return "Fricative"
     elif phone in AFFRICATES:
         return "Affricate"
-    elif phone in NASALS:
-        return "Nasal"
-    elif phone in APPROXIMANTS:
-        return "Approximant"
+    elif phone in NASALS_APPROXIMANTS:
+        return "Nasal-approximant"
     else:
         return "Other"
 
