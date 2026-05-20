@@ -29,8 +29,8 @@ WINDOW_START_SEC = -0.200
 WINDOW_END_SEC = 0.200
 
 # Extract raw acoustic contours every 10 ms, then sample phoneme windows every 40 ms.
-RAW_TIME_STEP_SEC = 0.010
-DOWNSAMPLED_TIME_STEP_SEC = 0.040
+RAW_TIME_STEP_SEC = 0.001
+DOWNSAMPLED_TIME_STEP_SEC = 0.020
 
 # Pitch settings for Praat/parselmouth. Adjust if needed for a different speaker set.
 PITCH_FLOOR_HZ = 75
@@ -44,7 +44,7 @@ SCRIPT_PATH = Path(__file__)
 PROJECT_ROOT = SCRIPT_PATH.parents[2]
 
 TEXTGRID_DIR = PROJECT_ROOT / "emo_audio" / "3_mfa" / "pilot"
-WAV_DIR = PROJECT_ROOT / "emo_audio" / "2_processed" / "pilot" / "cleaned"
+WAV_DIR = PROJECT_ROOT / "emo_audio" / "2_processed" / "pilot" / "cleaned" / "scaled"
 
 FEATURE_ROOT = PROJECT_ROOT / "emo_audio" / "5_acoustic_features" / "pilot"
 PITCH_DIR = FEATURE_ROOT / "pitch"
@@ -375,7 +375,8 @@ def main():
         if not keep_file(tags):
             continue
 
-        wav_path = WAV_DIR / f"{textgrid_path.stem}.wav"
+        # wav_path = WAV_DIR / f"{textgrid_path.stem}.wav"
+        wav_path = WAV_DIR / f"{textgrid_path.stem}_scaled.wav"
 
         if not wav_path.exists():
             n_missing_wavs += 1
