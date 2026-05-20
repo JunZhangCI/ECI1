@@ -68,3 +68,6 @@ figures/generated/
 
 # ignore automation codes
 automation/
+
+# ignore AI agents.md
+agents.md
