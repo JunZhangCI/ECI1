@@ -52,6 +52,7 @@ docs/
 **/*.docx
 **/*.pdf
 **/*.pptx
+5_writing/
 4_presentation/
 
 # Logs and temporary outputs
