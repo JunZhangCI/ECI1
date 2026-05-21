@@ -1,12 +1,58 @@
-"""Convert trial-level EEG .mat files to Eelbrain TRF-ready pickles.
+r"""Convert trial-level EEG .mat files to Eelbrain TRF-ready pickles.
 
-Input files are expected under:
+The script reads preprocessed by-trial MATLAB files from:
+
     2_data/2_processed/{group}/{subject}/ref_down_filt_chRej/ica/by_trial
 
-Each input .mat file should contain a top-level ``trial_EEG`` structure from
-``3_code/3_preprocessing/step4_restruct_data.m``. The script saves one
-session-specific Eelbrain Dataset pickle per input file under:
+Each input ``.mat`` file should contain a top-level ``trial_EEG`` structure
+created by ``3_code/3_preprocessing/step4_restruct_data.m``. The script saves
+one session-specific Eelbrain Dataset pickle per input file under:
+
     2_data/3_trf/{group}/eegs
+
+Usage from the project root:
+
+    .\.venv\Scripts\python.exe 3_code\4_compute_trf\trf_eeg_trial_mat_to_eelbrain.py --group pilot --sessions both
+
+Show the command-line help:
+
+    .\.venv\Scripts\python.exe 3_code\4_compute_trf\trf_eeg_trial_mat_to_eelbrain.py --help
+
+Choose a group with ``--group``:
+
+    pilot
+    NH
+    CI
+
+Choose sessions with ``--sessions``:
+
+    ses-1
+    ses-2
+    both
+
+Examples:
+
+    .\.venv\Scripts\python.exe 3_code\4_compute_trf\trf_eeg_trial_mat_to_eelbrain.py --group pilot --subjects sub-pilot_1 --sessions ses-1 --overwrite
+    .\.venv\Scripts\python.exe 3_code\4_compute_trf\trf_eeg_trial_mat_to_eelbrain.py --group NH --sessions both
+    .\.venv\Scripts\python.exe 3_code\4_compute_trf\trf_eeg_trial_mat_to_eelbrain.py --group CI --subjects sub-CI_1 sub-CI_2 --sessions ses-2
+
+Command-line options:
+
+    --group
+        Which participant group to process. This controls the input folder under
+        ``2_data/2_processed`` and the output folder under ``2_data/3_trf``.
+
+    --subjects
+        Optional list of subject folders to process. If omitted, the script
+        detects all folders beginning with ``sub`` in the selected group.
+
+    --sessions
+        Which session files to convert. Use ``ses-1`` or ``ses-2`` for one
+        session, or ``both`` to process both sessions separately.
+
+    --overwrite
+        Replace existing EEG pickle files. Without this flag, existing output
+        files are skipped.
 """
 
 from __future__ import annotations
@@ -283,7 +329,14 @@ def convert_files(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Convert trial-level EEG .mat files to Eelbrain Dataset pickles."
+        description="Convert trial-level EEG .mat files to Eelbrain Dataset pickles.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=r"""Examples:
+  .\.venv\Scripts\python.exe 3_code\4_compute_trf\trf_eeg_trial_mat_to_eelbrain.py --help
+  .\.venv\Scripts\python.exe 3_code\4_compute_trf\trf_eeg_trial_mat_to_eelbrain.py --group pilot --subjects sub-pilot_1 --sessions ses-1 --overwrite
+  .\.venv\Scripts\python.exe 3_code\4_compute_trf\trf_eeg_trial_mat_to_eelbrain.py --group NH --sessions both
+  .\.venv\Scripts\python.exe 3_code\4_compute_trf\trf_eeg_trial_mat_to_eelbrain.py --group CI --subjects sub-CI_1 sub-CI_2 --sessions ses-2
+""",
     )
     parser.add_argument(
         "--group",
