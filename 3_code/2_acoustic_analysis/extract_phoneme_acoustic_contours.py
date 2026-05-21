@@ -7,6 +7,7 @@ import pandas as pd
 
 try:
     import parselmouth
+    from parselmouth.praat import call
 except ImportError as exc:
     raise ImportError(
         "This script needs praat-parselmouth. Install it with: "
@@ -25,16 +26,25 @@ SELECTED_SPEAKING_STYLES = set()  # e.g., {"CDS"} or set()
 PHONE_TIER_NAME = "phones"
 
 # Window around each phoneme onset. Time 0 is the phoneme onset.
-WINDOW_START_SEC = -0.200
-WINDOW_END_SEC = 0.200
+WINDOW_START_SEC = -0.500
+WINDOW_END_SEC = 0.500
 
-# Extract raw acoustic contours every 10 ms, then sample phoneme windows every 40 ms.
+# Extract raw acoustic contours every 1 ms, then sample phoneme windows every 10 ms.
 RAW_TIME_STEP_SEC = 0.001
 DOWNSAMPLED_TIME_STEP_SEC = 0.020
 
 # Pitch settings for Praat/parselmouth. Adjust if needed for a different speaker set.
 PITCH_FLOOR_HZ = 75
-PITCH_CEILING_HZ = 600
+PITCH_TOP_HZ = 800
+PITCH_MAX_CANDIDATES = 15
+PITCH_VERY_ACCURATE = False
+PITCH_ATTENUATION_AT_TOP = 0.03
+PITCH_SILENCE_THRESHOLD = 0.09
+PITCH_VOICING_THRESHOLD = 0.50
+PITCH_OCTAVE_COST = 0.055
+PITCH_OCTAVE_JUMP_COST = 0.35
+PITCH_VOICED_UNVOICED_COST = 0.14
+PITCH_METHOD = "filtered_autocorrelation"
 
 
 # =========================
@@ -184,6 +194,28 @@ def make_relative_times():
     return WINDOW_START_SEC + np.arange(n_steps + 1) * DOWNSAMPLED_TIME_STEP_SEC
 
 
+def feature_settings():
+    """
+    Return extraction settings saved with each acoustic-feature pickle.
+    """
+    return {
+        "raw_time_step_sec": RAW_TIME_STEP_SEC,
+        "pitch_method": PITCH_METHOD,
+        "pitch_floor_hz": PITCH_FLOOR_HZ,
+        "pitch_top_hz": PITCH_TOP_HZ,
+        "pitch_max_candidates": PITCH_MAX_CANDIDATES,
+        "pitch_very_accurate": PITCH_VERY_ACCURATE,
+        "pitch_attenuation_at_top": PITCH_ATTENUATION_AT_TOP,
+        "pitch_silence_threshold": PITCH_SILENCE_THRESHOLD,
+        "pitch_voicing_threshold": PITCH_VOICING_THRESHOLD,
+        "pitch_octave_cost": PITCH_OCTAVE_COST,
+        "pitch_octave_jump_cost": PITCH_OCTAVE_JUMP_COST,
+        "pitch_voiced_unvoiced_cost": PITCH_VOICED_UNVOICED_COST,
+        "parselmouth_version": parselmouth.__version__,
+        "praat_version": parselmouth.PRAAT_VERSION,
+    }
+
+
 def save_feature_pickle(feature_dir, stem, feature_name, audio_filename, time_sec, values):
     """
     Save one feature contour for one wav file.
@@ -196,17 +228,45 @@ def save_feature_pickle(feature_dir, stem, feature_name, audio_filename, time_se
         "feature_name": feature_name,
         "time_sec": np.asarray(time_sec, dtype=float),
         "value": np.asarray(values, dtype=float),
-        "settings": {
-            "raw_time_step_sec": RAW_TIME_STEP_SEC,
-            "pitch_floor_hz": PITCH_FLOOR_HZ,
-            "pitch_ceiling_hz": PITCH_CEILING_HZ,
-        },
+        "settings": feature_settings(),
     }
 
     with pickle_path.open("wb") as file:
         pickle.dump(feature_data, file, protocol=pickle.HIGHEST_PROTOCOL)
 
     return pickle_path
+
+
+def extract_filtered_autocorrelation_pitch(sound):
+    """
+    Extract pitch with Praat's filtered-autocorrelation method.
+    """
+    try:
+        return call(
+            sound,
+            "To Pitch (filtered autocorrelation)",
+            RAW_TIME_STEP_SEC,
+            PITCH_FLOOR_HZ,
+            PITCH_TOP_HZ,
+            PITCH_MAX_CANDIDATES,
+            PITCH_VERY_ACCURATE,
+            PITCH_ATTENUATION_AT_TOP,
+            PITCH_SILENCE_THRESHOLD,
+            PITCH_VOICING_THRESHOLD,
+            PITCH_OCTAVE_COST,
+            PITCH_OCTAVE_JUMP_COST,
+            PITCH_VOICED_UNVOICED_COST,
+        )
+    except parselmouth.PraatError as exc:
+        raise RuntimeError(
+            "Praat filtered autocorrelation is not available in this "
+            "praat-parselmouth environment. Current versions: "
+            f"parselmouth {parselmouth.__version__}, Praat "
+            f"{parselmouth.PRAAT_VERSION}. This project needs a "
+            "Parselmouth build with a newer bundled Praat that supports "
+            "'To Pitch (filtered autocorrelation)'. No raw-autocorrelation "
+            "fallback was used, so pitch outputs will not be mislabeled."
+        ) from exc
 
 
 def extract_and_cache_features(wav_path):
@@ -216,11 +276,7 @@ def extract_and_cache_features(wav_path):
     """
     sound = parselmouth.Sound(str(wav_path))
 
-    pitch = sound.to_pitch(
-        time_step=RAW_TIME_STEP_SEC,
-        pitch_floor=PITCH_FLOOR_HZ,
-        pitch_ceiling=PITCH_CEILING_HZ,
-    )
+    pitch = extract_filtered_autocorrelation_pitch(sound)
     pitch_time_sec = pitch.xs()
     pitch_hz = pitch.selected_array["frequency"].astype(float)
     pitch_hz[pitch_hz == 0] = np.nan
