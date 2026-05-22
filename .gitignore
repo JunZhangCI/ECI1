@@ -72,3 +72,6 @@ automation/
 
 # ignore AI agents.md
 agents.md
+
+# ignore matlab resources
+resources/
