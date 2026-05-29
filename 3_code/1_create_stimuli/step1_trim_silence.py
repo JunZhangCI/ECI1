@@ -6,10 +6,15 @@ import numpy as np
 import soundfile as sf
 
 # --- Configuration ---
-raw_audio_conditions = ['Male CDS', 'Male ADS', 'Fem CDS', 'Fem ADS']
-audio_sets = ['Test', 'Training']
+raw_audio_conditions = [
+    {'label': 'Male CDS', 'style': 'CDS', 'gender': 'male', 'speaker': 'speaker_98'},
+    {'label': 'Male ADS', 'style': 'ADS', 'gender': 'male', 'speaker': 'speaker_62'},
+    {'label': 'Fem CDS', 'style': 'CDS', 'gender': 'female', 'speaker': 'speaker_99'},
+    {'label': 'Fem ADS', 'style': 'ADS', 'gender': 'female', 'speaker': 'speaker_54'},
+]
+audio_sets = ['test', 'training']
 
-trim_silence = True  # Set to True to enable trimming silence from audio files
+trim_silence = False  # Set to True to enable trimming silence from audio files
 top_db = 20  # Threshold in decibels for trimming silence (lower means more aggressive trimming)
 frame_length = 512  # Frame length for trimming (in samples)
 hop_length = 128  # Hop length for trimming (in samples)
@@ -17,7 +22,7 @@ hop_length = 128  # Hop length for trimming (in samples)
 # --- Path setup ---
 script_path = Path(__file__)
 project_root = script_path.parents[2]
-raw_audio_dir = project_root / "emo_audio" / "1_MC_2015"
+raw_audio_dir = project_root / "emo_audio" / "1_raw" / "MC_2015"
 if trim_silence:
     out_audio_dir = project_root / "emo_audio" / "2_processed" / "trimmed"
 else:
@@ -31,12 +36,18 @@ if trim_silence:
 
 # --- Processing ---
 for condition in raw_audio_conditions:  
-    style = condition.split()[1]  
+    style = condition['style']
 
     for audio_set in audio_sets:
-        condition_audio_path = f"{raw_audio_dir}/{style} Stimuli/{condition}/{audio_set}"   
-        wav_files = librosa.util.find_files(condition_audio_path, ext='wav')  
-        print(f"Processing {condition} - {audio_set}: Found {len(wav_files)} files.")
+        condition_audio_path = (
+            raw_audio_dir
+            / style
+            / condition['gender']
+            / condition['speaker']
+            / audio_set
+        )
+        wav_files = librosa.util.find_files(str(condition_audio_path), ext='wav')  
+        print(f"Processing {condition['label']} - {audio_set}: Found {len(wav_files)} files.")
 
         for wav_path in wav_files:
             # Extract filename components
