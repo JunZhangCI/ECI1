@@ -1,77 +1,37 @@
-# Local operating system and editor files
-.DS_Store
-Thumbs.db
-desktop.ini
-**/desktop.ini
-.vscode/*
-!.vscode/
-!.vscode/*.json
+# Ignore every new file by default. Add explicit allow rules below for
+# source files and small shared project metadata that are safe to track.
+*
 
-# Python caches and virtual environments
-__pycache__/
-*.py[cod]
-.ipynb_checkpoints/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.venv/
-venv/
-env/
+# Root project metadata
+!/.gitignore
+!/.gitattributes
+!/.pre-commit-config.yaml
+!/README.md
+!/requirements.txt
+!/ECI1.prj
 
-# MATLAB generated files and autosaves
-*.asv
-*.m~
-slprj/
+# Shared editor settings
+!/.vscode/
+!/.vscode/*.json
 
-# Local research data: do not version participant data or generated outputs
-2_data/
-emo_audio/
-docs/
+# Shared pipeline configuration
+!/config/
+!/config/**/
+!/config/*.json
+!/config/**/*.json
 
-# Generated study stimuli and audio exports can appear outside emo_audio
-**/stimuli/
-**/scaled/
-**/*.wav
-**/*.mp3
-**/*.flac
-**/*.aiff
-**/*.TextGrid
+# MATLAB, Python, and small text source files
+!/3_code/
+!/3_code/**/
+!/3_code/.gitignore
+!/3_code/**/.gitignore
+!/3_code/**/*.m
+!/3_code/**/*.py
+!/3_code/**/*.yaml
+!/3_code/**/*.yml
+!/3_code/**/*.csv
+!/3_code/**/*.sh
+!/3_code/**/*.txt
 
-# EEG, MATLAB data, and model outputs
-**/*.bdf
-**/*.edf
-**/*.set
-**/*.fdt
-**/*.mat
-**/*.pkl
-**/*.pickle
-**/*.h5
-**/*.hdf5
-
-# Rendered writing and presentation artifacts
-**/*.docx
-**/*.pdf
-**/*.pptx
-5_writing/
-4_presentation/
-
-# Logs and temporary outputs
-*.log
-logs/
-tmp/
-temp/
-outputs/
-results/
-figures/generated/
-
-# Keep source notebooks, but strip outputs before commit via nbstripout/pre-commit
-!**/*.ipynb
-
-# ignore automation codes
-automation/
-
-# ignore AI agents.md
-agents.md
-
-# ignore matlab resources
-resources/
+# Notebooks are intentionally not whitelisted here. Existing tracked
+# notebooks stay tracked, but new notebooks require exact path approval.
